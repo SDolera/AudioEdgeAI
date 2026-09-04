@@ -1,0 +1,22 @@
+# Dataset
+data/
+
+# Documentation
+docs/
+
+# Generated outputs
+outputs/
+
+# Practice / experimental code
+practice/
+
+# Local scripts
+scripts/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+venv/
