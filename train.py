@@ -62,6 +62,8 @@ from torch import nn
 
 from tqdm import tqdm
 
+from src.preprocessing.speech_denoise_dataprep import prepare_dataset
+from src.models.custom_denoising import CustomDenoiser
 
 def setup_args():
     parser = argparse.ArgumentParser()
@@ -73,3 +75,18 @@ def setup_args():
     args = parser.parse_args()
 
     return args
+
+
+def train_model(train_dataloader, total_epochs, resume_path):
+
+
+    pass
+
+
+def main():
+    pass
+
+
+
+if __name__ == "__main__":
+    main()
