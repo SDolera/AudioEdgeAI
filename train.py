@@ -65,6 +65,8 @@ from tqdm import tqdm
 from src.preprocessing.speech_denoise_dataprep import prepare_dataset
 from src.models.custom_denoising import CustomDenoiser
 
+import torch.optim as optim
+
 def setup_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("Dataset_path", type=Path)
@@ -76,8 +78,46 @@ def setup_args():
 
     return args
 
+def set_dataloader(train_dataset, test_dataset):
+    load_train = DataLoader(train_dataset, batch_size=16, shuffle=True, num_workers=2,
+                            pin_memory=torch.cuda.is_available())
+    load_test = DataLoader(test_dataset, batch_size=16, shuffle=False, num_workers=2,
+                           pin_memory=torch.cuda.is_available())
+    
+    return load_train, load_test
 
 def train_model(train_dataloader, total_epochs, resume_path):
+    model = CustomDenoiser()
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_param = sum(p.numel() for p in model.parameters() if p.requires_grad)
+
+    print("Model total parameters: ", total_params)
+    print("Model trainable parameters: ", trainable_param)
+
+    optimizer = optim.adam(model.parameters(), lr=0.01)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("Device used for training: ", device)
+
+    model.to(device)
+    model.train()
+    loss = nn.MSELoss()
+    best_mse_loss = float('inf')
+    start_epoch = -1
+
+    for epoch in total_epochs:
+        per_epoch_loss = 0
+        
+        for noisy, clean in tqdm(train_dataloader, desc=f"Epoch [{epoch+1}/{total_epochs}]", leave=False):
+            noisy = noisy.to(device)
+            clean = clean.to(device)
+            optimizer.zero_grad()
+            output = model(noisy)
+            model_loss = loss(output, clean)
+            model_loss.backward()
+            optimizer.step()
+            per_epoch_loss += model_loss.item()
+
+        avg_loss = per_epoch_loss / len(train_dataloader)
 
 
     pass
