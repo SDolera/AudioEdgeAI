@@ -21,7 +21,7 @@ def retrieve_subfolders(dataset_path, set_keyword):
     return subfolders_path
 
 
-def arrange_subfolders_content(subfolders_path):
+def arrange_subfolders_content(subfolders_path, percentage):
     arrange_subfolder_file = {}
 
     for each in tqdm(subfolders_path, desc="Arranging subfolders"):
@@ -29,6 +29,9 @@ def arrange_subfolders_content(subfolders_path):
         for file in each.iterdir():
             if file.suffix.lower() == ".wav":
                 arrange_subfolder_file[each].append(file)
+        total_content = len(arrange_subfolder_file[each])
+        user_allowed = int(total_content * percentage)
+        arrange_subfolder_file[each] = arrange_subfolder_file[each][:user_allowed]
     
     return arrange_subfolder_file
 
@@ -113,10 +116,10 @@ def rms_scaled(valid_pair_with_rms, rms_median):
     return valid_pair_with_rms_scaled
 
 
-def prepare_dataset(dataset_path, set_keyword):
+def prepare_dataset(dataset_path, set_keyword, percentage):
 
     subfolders = retrieve_subfolders(dataset_path, set_keyword)
-    arrange_subfolders = arrange_subfolders_content(subfolders)
+    arrange_subfolders = arrange_subfolders_content(subfolders, percentage)
     filter_file_by_specs = filter_valid_file(arrange_subfolders)
     filter_file_by_frames = equal_nframes(filter_file_by_specs)
     pair_with_rms, rms_median = compute_rms_list_and_median(filter_file_by_frames)
