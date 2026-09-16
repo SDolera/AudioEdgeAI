@@ -64,6 +64,7 @@ from tqdm import tqdm
 
 from src.preprocessing.speech_denoise_dataprep import prepare_dataset
 from src.models.custom_denoising import CustomDenoiser
+from src.datasets.custom_denoising_dataset import custom_denoiser_dataset
 
 import torch.optim as optim
 
@@ -74,6 +75,7 @@ def setup_args():
     parser.add_argument("--train_keyword", type=str, default="train")
     parser.add_argument("--test_keyword", type=str, default="test")
     parser.add_argument("--resume_training", type=Path)
+    parser.add_argument("--percentage", type=float, default=0.3)
     args = parser.parse_args()
 
     return args
@@ -124,7 +126,18 @@ def train_model(train_dataloader, total_epochs, resume_path):
 
 
 def main():
-    pass
+    args = setup_args()
+
+    print("Preparing Train set.")
+    prepare_train_dataset = prepare_dataset(args.Dataset_path, args.train_keyword)
+    print("Preparing Test set")
+    prepare_test_dataset = prepare_dataset(args.Dataset_path, args.test_keyword)
+
+    train_dataset = custom_denoiser_dataset(prepare_train_dataset)
+    test_dataset = custom_denoiser_dataset(prepare_test_dataset)
+    train_dataloader, test_dataloader = set_dataloader(train_dataset, test_dataset)
+
+    model = train_model(train_dataloader, args.n_epoch)
 
 
 
