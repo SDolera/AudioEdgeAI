@@ -129,9 +129,9 @@ def main():
     args = setup_args()
 
     print("Preparing Train set.")
-    prepare_train_dataset = prepare_dataset(args.Dataset_path, args.train_keyword)
+    prepare_train_dataset = prepare_dataset(args.Dataset_path, args.train_keyword, args.percentage)
     print("Preparing Test set")
-    prepare_test_dataset = prepare_dataset(args.Dataset_path, args.test_keyword)
+    prepare_test_dataset = prepare_dataset(args.Dataset_path, args.test_keyword, args.percentage)
 
     train_dataset = custom_denoiser_dataset(prepare_train_dataset)
     test_dataset = custom_denoiser_dataset(prepare_test_dataset)
